@@ -24,18 +24,56 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.n_class = N_CLASS
         self.layers = nn.Sequential(
-            #########################################
-            ###        TODO: Add more layers      ###
-            #########################################
-            nn.Conv2d(3, 96, 5, padding=2),
-            nn.Conv2d(96, 256, 5, padding=2),
-            nn.Conv2d(256, 384, 5, padding=2),
-            # nn.Conv2d(384, 384, 5, padding=2),
-            nn.Conv2d(384, 256, 5, padding=2),
-            nn.Conv2d(256, 4096, 5, padding=2),
-            # nn.Conv2d(4096, 4096, 5, padding=2),
-            nn.Conv2d(4096, self.n_class, 5, padding=2),
-            nn.ReLU(inplace=True)
+            # conv1
+            nn.Conv2d(3, 96, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/2
+
+            # conv2
+            nn.Conv2d(96, 256, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, stride=2, ceil_mode=True), # 1/4
+
+            # conv3
+            nn.Conv2d(256, 384, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/8
+
+            # conv4
+            nn.Conv2d(384, 384, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(384, 256, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/16
+
+            # conv5
+            nn.Conv2d(256, 4096, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(4096, 4096, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(4096, self.n_class, 3, padding=1),
+            nn.ReLU(inplace=True),
+
+            # # fc6
+            # nn.Conv2d(512, 4096, 7),
+            # nn.ReLU(inplace=True),
+            # nn.Dropout2d(),
+
+            # # fc7
+            # nn.Conv2d(4096, 4096, 1),
+            # nn.ReLU(inplace=True),
+            # nn.Dropout2d(),
+
+            # nn.Conv2d(4096, self.n_class, 1),
+            # nn.Conv2d(256, self.n_class, 1),
+            # nn.Conv2d(512, self.n_class, 1),
+
+            nn.ConvTranspose2d(self.n_class, self.n_class, 4, stride=2, bias=False, padding=1),
+            nn.ConvTranspose2d(self.n_class, self.n_class, 16, stride=8, bias=False, padding=4)
+            # nn.ConvTranspose2d(self.n_class, self.n_class, 4, stride=2, bias=False),
+
+            # nn.Conv2d(self.n_class, 1, 1)
+            
         )
 
     def forward(self, x):
